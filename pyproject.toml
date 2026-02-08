@@ -1,0 +1,13 @@
+[project]
+name = "my-project"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = [
+    "loguru>=0.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.9.0",
+    "ty>=0.0.1a6",
+]

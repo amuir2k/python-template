@@ -1,10 +1,12 @@
 #!/bin/bash
 # Development environment setup script
-# Installs uv, ruff, ty and pulls custom .gitignore
+# Installs uv, pulls pyproject.toml and .gitignore, syncs dependencies
 #
 # Usage: curl -sL https://raw.githubusercontent.com/amuir2k/python-template/main/setup_dev.sh | bash
 
 set -e
+
+REPO_URL="https://raw.githubusercontent.com/amuir2k/python-template/main"
 
 echo "=== Python Development Environment Setup ==="
 
@@ -17,27 +19,37 @@ else
     echo "uv already installed"
 fi
 
-# Install ruff and ty
-echo "Installing ruff and ty..."
-uv pip install ruff ty
+# Pull pyproject.toml (loguru + ruff/ty dev deps)
+if [ ! -f pyproject.toml ]; then
+    echo "Downloading pyproject.toml..."
+    curl -sL "$REPO_URL/pyproject.toml" -o pyproject.toml
+    echo "pyproject.toml created"
+else
+    echo "pyproject.toml already exists"
+fi
 
 # Pull custom .gitignore (Python + macOS + JetBrains + Claude Code)
 if [ ! -f .gitignore ]; then
     echo "Downloading .gitignore..."
-    curl -sL https://raw.githubusercontent.com/amuir2k/python-template/main/.gitignore -o .gitignore
+    curl -sL "$REPO_URL/.gitignore" -o .gitignore
     echo ".gitignore created"
 else
     echo ".gitignore already exists"
 fi
 
+# Sync all dependencies including dev
+echo "Installing dependencies..."
+uv sync --all-extras
+
 echo ""
 echo "=== Setup Complete ==="
-echo "Tools installed:"
+echo "Installed:"
 echo "  - uv (Python package manager)"
+echo "  - loguru (logging)"
 echo "  - ruff (linter/formatter)"
 echo "  - ty (type checker)"
 echo ""
 echo "Usage:"
-echo "  ruff check --fix .   # Lint and fix"
-echo "  ruff format .        # Format code"
-echo "  uv run ty check .    # Type check"
+echo "  uv run ruff check --fix .   # Lint and fix"
+echo "  uv run ruff format .        # Format code"
+echo "  uv run ty check .           # Type check"
